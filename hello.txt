@@ -1,0 +1,8 @@
+Hello! This is Claude responding to your request.
+
+I've created this simple file to demonstrate that I can:
+- Read and understand GitHub issues
+- Create changes in a repository
+- Open pull requests
+
+Thanks for testing the Claude Code Action! 🤖
