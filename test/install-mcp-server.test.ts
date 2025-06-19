@@ -411,4 +411,85 @@ describe("prepareMcpConfig", () => {
 
     process.env.GITHUB_WORKSPACE = oldEnv;
   });
+
+  test("should include file_ops server when create_pull_request tool is allowed", async () => {
+    const result = await prepareMcpConfig({
+      githubToken: "test-token",
+      owner: "test-owner",
+      repo: "test-repo",
+      branch: "test-branch",
+      allowedTools: [
+        "mcp__github_file_ops__create_pull_request",
+        "mcp__github_file_ops__commit_files",
+      ],
+    });
+
+    const parsed = JSON.parse(result);
+    expect(parsed.mcpServers).toBeDefined();
+    expect(parsed.mcpServers.github).not.toBeDefined();
+    expect(parsed.mcpServers.github_file_ops).toBeDefined();
+    expect(parsed.mcpServers.github_file_ops.env.GITHUB_TOKEN).toBe(
+      "test-token",
+    );
+    expect(parsed.mcpServers.github_file_ops.env.REPO_OWNER).toBe("test-owner");
+    expect(parsed.mcpServers.github_file_ops.env.REPO_NAME).toBe("test-repo");
+    expect(parsed.mcpServers.github_file_ops.env.BRANCH_NAME).toBe(
+      "test-branch",
+    );
+  });
+
+  test("should include all file_ops tools including create_pull_request", async () => {
+    const result = await prepareMcpConfig({
+      githubToken: "test-token",
+      owner: "test-owner",
+      repo: "test-repo",
+      branch: "test-branch",
+      allowedTools: [
+        "mcp__github_file_ops__commit_files",
+        "mcp__github_file_ops__delete_files",
+        "mcp__github_file_ops__update_claude_comment",
+        "mcp__github_file_ops__create_pull_request",
+      ],
+    });
+
+    const parsed = JSON.parse(result);
+    expect(parsed.mcpServers).toBeDefined();
+    expect(parsed.mcpServers.github).not.toBeDefined();
+    expect(parsed.mcpServers.github_file_ops).toBeDefined();
+
+    // Verify all environment variables are set for PR creation
+    expect(parsed.mcpServers.github_file_ops.env.GITHUB_TOKEN).toBe(
+      "test-token",
+    );
+    expect(parsed.mcpServers.github_file_ops.env.REPO_OWNER).toBe("test-owner");
+    expect(parsed.mcpServers.github_file_ops.env.REPO_NAME).toBe("test-repo");
+    expect(parsed.mcpServers.github_file_ops.env.BRANCH_NAME).toBe(
+      "test-branch",
+    );
+  });
+
+  test("should work with mixed github and file_ops tools including create_pull_request", async () => {
+    const result = await prepareMcpConfig({
+      githubToken: "test-token",
+      owner: "test-owner",
+      repo: "test-repo",
+      branch: "test-branch",
+      allowedTools: [
+        "mcp__github__create_issue",
+        "mcp__github_file_ops__create_pull_request",
+        "mcp__github_file_ops__commit_files",
+      ],
+    });
+
+    const parsed = JSON.parse(result);
+    expect(parsed.mcpServers).toBeDefined();
+    expect(parsed.mcpServers.github).toBeDefined();
+    expect(parsed.mcpServers.github_file_ops).toBeDefined();
+    expect(parsed.mcpServers.github.env.GITHUB_PERSONAL_ACCESS_TOKEN).toBe(
+      "test-token",
+    );
+    expect(parsed.mcpServers.github_file_ops.env.GITHUB_TOKEN).toBe(
+      "test-token",
+    );
+  });
 });
