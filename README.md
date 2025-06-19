@@ -12,6 +12,7 @@ A general-purpose [Claude Code](https://claude.ai/code) action for GitHub PRs an
 - 💬 **PR/Issue Integration**: Works seamlessly with GitHub comments and PR reviews
 - 🛠️ **Flexible Tool Access**: Access to GitHub APIs and file operations (additional tools can be enabled via configuration)
 - 📋 **Progress Tracking**: Visual progress indicators with checkboxes that dynamically update as Claude completes tasks
+- 🚀 **Pull Request Creation**: Can create pull requests to propose changes (requires explicit tool permission)
 - 🏃 **Runs on Your Infrastructure**: The action executes entirely on your own GitHub runner (Anthropic API calls go to your chosen provider)
 
 ## Quickstart

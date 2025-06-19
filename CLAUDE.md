@@ -22,23 +22,14 @@ bun run format:check    # Check code formatting
 bun run typecheck       # Run TypeScript type checking
 ```
 
-## Current Development - PR Creation Feature
+## PR Creation Feature
 
-We're adding a new `create_pull_request` tool to the GitHub MCP server that allows Claude to open pull requests. This feature:
+This fork includes the `create_pull_request` tool that allows Claude to open pull requests:
 
-1. **Implementation**: Added to `src/mcp/github-file-ops-server.ts`
-2. **Tool Schema**: Accepts title, body, base branch, head branch (optional), and draft status
-3. **Tests**: Unit tests added to `test/install-mcp-server.test.ts`
-4. **Testing Strategy**: Fork this repo and test on external repositories using `uses: your-username/claude-code-action@branch`
-
-### Testing the PR Creation Feature
-
-To test this feature:
-1. Fork this repository
-2. Push changes to your fork
-3. In your test repo's workflow, use: `uses: stets/claude-code-action@main`
-4. Create an issue and ask Claude to create files and open a PR
-5. Ensure the workflow includes: `allowed_tools: "mcp__github_file_ops__create_pull_request"`
+1. **Implementation**: Available in `src/mcp/github-file-ops-server.ts`
+2. **Tool Schema**: Accepts title, body, base branch, head branch (optional), and draft status  
+3. **Usage**: Include `allowed_tools: "mcp__github_file_ops__create_pull_request"` in workflow
+4. **Testing**: Use `uses: stets/claude-code-action@main` in external repos to test
 
 ## Architecture Overview
 
