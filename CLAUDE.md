@@ -17,6 +17,9 @@ bun test
 # Formatting
 bun run format          # Format code with prettier
 bun run format:check    # Check code formatting
+
+# Type checking
+bun run typecheck       # Run TypeScript type checking
 ```
 
 ## Architecture Overview

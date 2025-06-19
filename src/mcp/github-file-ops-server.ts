@@ -505,6 +505,91 @@ server.tool(
   },
 );
 
+// Create pull request tool
+server.tool(
+  "create_pull_request",
+  "Create a new pull request from the current branch to a target branch",
+  {
+    title: z.string().describe("Pull request title"),
+    body: z.string().describe("Pull request description/body"),
+    base: z.string().describe("Target branch (e.g. 'main')"),
+    head: z
+      .string()
+      .optional()
+      .describe("Source branch (defaults to current branch)"),
+    draft: z
+      .boolean()
+      .optional()
+      .describe("Create as draft PR (defaults to false)"),
+  },
+  async ({ title, body, base, head, draft = false }) => {
+    const owner = REPO_OWNER;
+    const repo = REPO_NAME;
+    const sourceBranch = head || BRANCH_NAME;
+
+    try {
+      const githubToken = process.env.GITHUB_TOKEN;
+      if (!githubToken) {
+        throw new Error("GITHUB_TOKEN environment variable is required");
+      }
+
+      const octokit = new Octokit({
+        auth: githubToken,
+        baseUrl: GITHUB_API_URL,
+      });
+
+      const result = await octokit.rest.pulls.create({
+        owner: owner!,
+        repo: repo!,
+        title,
+        body,
+        base,
+        head: sourceBranch!,
+        draft,
+      });
+
+      const simplifiedResult = {
+        number: result.data.number,
+        url: result.data.html_url,
+        title: result.data.title,
+        state: result.data.state,
+        head: {
+          ref: result.data.head.ref,
+          sha: result.data.head.sha,
+        },
+        base: {
+          ref: result.data.base.ref,
+          sha: result.data.base.sha,
+        },
+        draft: result.data.draft,
+        created_at: result.data.created_at,
+      };
+
+      return {
+        content: [
+          {
+            type: "text",
+            text: JSON.stringify(simplifiedResult, null, 2),
+          },
+        ],
+      };
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Error: ${errorMessage}`,
+          },
+        ],
+        error: errorMessage,
+        isError: true,
+      };
+    }
+  },
+);
+
 async function runServer() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
